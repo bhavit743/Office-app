@@ -21,3 +21,5 @@ class GroupViewSet(viewsets.ModelViewSet):
             return Response({"error": "No file provided"}, status=400)
         count = import_clients(file)   
         return Response({"message": f"{count} clients uploaded successfully!"})
+
+

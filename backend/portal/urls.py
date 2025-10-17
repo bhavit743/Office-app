@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from blast import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("blast.api_urls")),
+    path("download-template/", views.download_template, name="download_template")
 ]
