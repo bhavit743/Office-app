@@ -131,10 +131,11 @@ def send_email(request):
             msg = EmailMultiAlternatives(
                 subject=subject,
                 body="This email requires HTML support.",
+                from_email="your_email@example.com",  # replace with your SMTP sender
                 to=[recipient],
             )
             msg.attach_alternative(html_content, "text/html")
-            msg.send(fail_silently=False)
+            msg.send()
             success_count += 1
         except Exception as e:
             failed.append({"email": recipient, "error": str(e)})
