@@ -142,8 +142,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
-EMAIL_HOST_USER = "bhavitgupta743@gmail.com"
-EMAIL_HOST_PASSWORD = "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"  # use App Password, not raw Gmail password
-
+SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
+#MAIL_HOST_PASSWORD = "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"  # use App Password, not raw Gmail password
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')
 
 
