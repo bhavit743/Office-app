@@ -231,7 +231,7 @@ export default function ContactsPage() {
               {uploading ? "Uploading..." : "Upload CSV"}
             </button>
             <a
-              href="http://127.0.0.1:8000/download-template/"
+              href="https://office-app-wu8a.onrender.com/download-template/"
               className="px-4 py-2 bg-gradient-to-r from-[#ECE4B7] to-[#E6AA68] text-[#020122] rounded-xl shadow hover:shadow-md hover:scale-105 transition-all duration-200 inline-block"
               download
             >
