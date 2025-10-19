@@ -19,3 +19,6 @@ six==1.16.0
 sqlparse==0.4.4
 tzdata==2023.3
 whitenoise==6.11.0
+setuptools>=65.0.0
+wheel>=0.38.0
+build>=0.10.0
