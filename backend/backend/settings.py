@@ -141,12 +141,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 465
-EMAIL_USE_TLS = True
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 EMAIL_HOST_USER = "bhavitgupta743@gmail.com"
-EMAIL_HOST_PASSWORD = "bxkwqsqtvgcgjpwu"  # use App Password, not raw Gmail password
+EMAIL_HOST_PASSWORD = "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"  # use App Password, not raw Gmail password
 
-EMAIL_USE_SSL = True
+
 
