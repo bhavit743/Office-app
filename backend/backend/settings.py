@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-92tawfz#mre9mflo8&5op$ey^7fisjxp@^+486e!po1^yq93@l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*',"https://office-app-wu8a.onrender.com"]
 STATIC_URL = "/static/"
@@ -142,7 +142,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')
 
-
+SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
+DEFAULT_FROM_EMAIL = os.environ.get("EMAIL_HOST")
