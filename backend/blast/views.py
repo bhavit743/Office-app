@@ -18,6 +18,7 @@ from .models import Client, Group
 from .utils import import_clients # new CSV helper
 from django.core.files.storage import default_storage
 from django.conf import settings
+import os
 
 # --------------------------
 #  CONTACTS PAGE (WEB VIEW)
@@ -225,7 +226,7 @@ def upload_image(request):
 
     # Save the file using Django's default storage
     file_name = default_storage.save(file_obj.name, file_obj)
-
+    print("Uploaded")
     # Construct the absolute URL
     # Use settings.MEDIA_URL which includes the leading/trailing slashes
     file_url = request.build_absolute_uri(settings.MEDIA_URL + file_name)
