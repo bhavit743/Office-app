@@ -19,10 +19,14 @@ from .utils import import_clients # new CSV helper
 from django.core.files.storage import default_storage
 from django.conf import settings
 import os
+import logging
 
 # --------------------------
 #  CONTACTS PAGE (WEB VIEW)
 # --------------------------
+
+logger = logging.getLogger(__name__)
+
 @login_required
 def contacts_page(request):
     clients = Client.objects.filter(owner=request.user)
@@ -208,28 +212,36 @@ def download_template(request):
 @parser_classes([MultiPartParser, FormParser]) # Handle file uploads
 def upload_image(request):
     """
-    Handles image uploads from the CKEditor.
-    Expects the file in a form field named 'upload'.
-    Returns the URL of the saved image.
+    Handles image uploads from the CKEditor with detailed logging.
     """
-    file_obj = request.FILES.get('upload') # 'upload' is the default field name CKEditor uses
+    logger.info("upload_image view started.") # Log start
+
+    file_obj = request.FILES.get('upload')
     if not file_obj:
+        logger.error("No file found in request.FILES['upload']") # Log error
         return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Basic validation (optional but recommended)
-    allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
-    ext = os.path.splitext(file_obj.name)[1].lower()
-    if ext not in allowed_extensions:
-        return Response({'error': 'Invalid file type.'}, status=status.HTTP_400_BAD_REQUEST)
-    if file_obj.size > 5 * 1024 * 1024: # Limit file size (e.g., 5MB)
-         return Response({'error': 'File size exceeds limit (5MB).'}, status=status.HTTP_400_BAD_REQUEST)
+    logger.info(f"Received file: {file_obj.name}, Size: {file_obj.size}")
 
-    # Save the file using Django's default storage
-    file_name = default_storage.save(file_obj.name, file_obj)
-    print("Uploaded")
-    # Construct the absolute URL
-    # Use settings.MEDIA_URL which includes the leading/trailing slashes
-    file_url = request.build_absolute_uri(settings.MEDIA_URL + file_name)
+    try:
+        logger.info("Attempting to save file to default storage (Google Cloud Storage)...")
+        
+        # This is the line that is likely failing
+        file_name = default_storage.save(file_obj.name, file_obj)
+        
+        logger.info(f"File successfully saved to GCS as: {file_name}")
 
-    # Return the URL in the format CKEditor expects
-    return Response({'url': file_url}, status=status.HTTP_201_CREATED)
+        # Construct the absolute URL
+        # Note: GCS storage doesn't use build_absolute_uri, it uses the MEDIA_URL
+        file_url = f'{settings.MEDIA_URL}{file_name}'
+        
+        logger.info(f"Generated file URL: {file_url}")
+
+        return Response({'url': file_url}, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        # --- THIS IS THE MOST IMPORTANT PART ---
+        # This will print the full Python traceback to your Render logs
+        logger.error(f"CRITICAL ERROR saving file to GCS: {e}", exc_info=True) 
+        # -------------------------------------
+        return Response({'error': 'Failed to save image. Check server logs.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
