@@ -1,7 +1,7 @@
 from rest_framework.routers import DefaultRouter
 from .api_views import ClientViewSet, GroupViewSet
 from django.urls import path, include
-from .views import send_email, upload_csv
+from .views import send_email, upload_csv, upload_image
 
 router = DefaultRouter()
 router.register(r'clients', ClientViewSet, basename='client')
@@ -11,4 +11,5 @@ urlpatterns = [
     path("", include(router.urls)),
     path("send-email/", send_email, name="send-email"),
     path("upload_csv/", upload_csv, name="upload_csv"),
+    path("images/upload/", upload_image, name='ckeditor-image-upload')
 ]
