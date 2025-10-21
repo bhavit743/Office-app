@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+import json
+import google.oauth2.service_account
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,6 +47,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 # Application definition
 
 INSTALLED_APPS = [
+    'storages',
     'rest_framework',
     'corsheaders',
     'django.contrib.admin',
@@ -142,7 +145,7 @@ if not DEBUG:
     # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
     # and renames the files with unique names for each version to support long-term caching
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -153,5 +156,29 @@ EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# --- GOOGLE CLOUD STORAGE CONFIGURATION ---
+
+# 1. Load the GCS credentials from an environment variable
+#    We'll paste the *entire content* of the JSON file into an env var.
+gcs_credentials_json = os.environ.get('GCS_CREDENTIALS')
+
+if gcs_credentials_json:
+    # 2. Parse the JSON string into credentials
+    gcs_credentials_info = json.loads(gcs_credentials_json)
+    GS_CREDENTIALS = google.oauth2.service_account.Credentials.from_service_account_info(gcs_credentials_info)
+else:
+    # This is a fallback for local testing if you want to use a file
+    # GS_CREDENTIALS = "path/to/your-gcs-key.json"
+    print("WARNING: GCS_CREDENTIALS environment variable not set.")
+    GS_CREDENTIALS = None
+
+# 3. Set the storage backend
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+
+# 4. Set your bucket name
+GS_BUCKET_NAME = os.environ.get('GS_BUCKET_NAME')
+
+# 5. Set the media URL
+#    This tells Django what the base URL for your files is.
+MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
+MEDIA_ROOT = '' # Django-storages handles this, so we clear the local path.
