@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import api from "@/lib/api";
 import { Client, Group } from "@/types";
+import { MyUploadAdapter } from '../lib/UploadAdapter';
 
 // ✅ Dynamically import CKEditor
 const CKEditor = dynamic(
@@ -79,6 +80,14 @@ export default function EmailPage() {
   const filteredClients = clients.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  // media uploader
+
+  function MyCustomUploadAdapterPlugin(editor: any) { // Use 'any' or import Editor type
+    editor.plugins.get('FileRepository').createUploadAdapter = (loader: any) => {
+      // Configure the adapter
+      return new MyUploadAdapter(loader);
+    };}
 
   // ✅ Send Email with batching
   const sendEmail = async () => {
@@ -225,6 +234,9 @@ export default function EmailPage() {
               <CKEditor
                 editor={ClassicEditor}
                 data={editorData}
+                config={{
+                  extraPlugins: [MyCustomUploadAdapterPlugin],
+                }}
                 onChange={(event, editor) => {
                   setEditorData(editor.getData());
                 }}

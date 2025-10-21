@@ -16,7 +16,8 @@ from io import TextIOWrapper
 from .forms import ClientForm, GroupForm, UploadFileForm
 from .models import Client, Group
 from .utils import import_clients # new CSV helper
-
+from django.core.files.storage import default_storage
+from django.conf import settings
 
 # --------------------------
 #  CONTACTS PAGE (WEB VIEW)
@@ -200,3 +201,34 @@ def download_template(request):
     writer.writerow(["John Doe", "john@example.com", "9876543210"])  # Example row
 
     return response
+
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser]) # Handle file uploads
+def upload_image(request):
+    """
+    Handles image uploads from the CKEditor.
+    Expects the file in a form field named 'upload'.
+    Returns the URL of the saved image.
+    """
+    file_obj = request.FILES.get('upload') # 'upload' is the default field name CKEditor uses
+    if not file_obj:
+        return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Basic validation (optional but recommended)
+    allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+    ext = os.path.splitext(file_obj.name)[1].lower()
+    if ext not in allowed_extensions:
+        return Response({'error': 'Invalid file type.'}, status=status.HTTP_400_BAD_REQUEST)
+    if file_obj.size > 5 * 1024 * 1024: # Limit file size (e.g., 5MB)
+         return Response({'error': 'File size exceeds limit (5MB).'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Save the file using Django's default storage
+    file_name = default_storage.save(file_obj.name, file_obj)
+
+    # Construct the absolute URL
+    # Use settings.MEDIA_URL which includes the leading/trailing slashes
+    file_url = request.build_absolute_uri(settings.MEDIA_URL + file_name)
+
+    # Return the URL in the format CKEditor expects
+    return Response({'url': file_url}, status=status.HTTP_201_CREATED)
