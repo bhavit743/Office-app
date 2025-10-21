@@ -20,6 +20,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 import os
 import logging
+from django.core.files.storage import default_storage
 
 # --------------------------
 #  CONTACTS PAGE (WEB VIEW)
@@ -221,21 +222,21 @@ def upload_image(request):
         logger.error("No file found in request.FILES['upload']") # Log error
         return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
 
-    logger.info(f"Received file: {file_obj.name}, Size: {file_obj.size}")
+    print(f"Received file: {file_obj.name}, Size: {file_obj.size}")
 
     try:
-        logger.info("Attempting to save file to default storage (Google Cloud Storage)...")
+        print("Attempting to save file to default storage (Google Cloud Storage)...")
         
         # This is the line that is likely failing
         file_name = default_storage.save(file_obj.name, file_obj)
         
-        logger.info(f"File successfully saved to GCS as: {file_name}")
+        print(f"File successfully saved to GCS as: {file_name}")
 
         # Construct the absolute URL
         # Note: GCS storage doesn't use build_absolute_uri, it uses the MEDIA_URL
         file_url = f'{settings.MEDIA_URL}{file_name}'
         
-        logger.info(f"Generated file URL: {file_url}")
+        print(f"Generated file URL: {file_url}")
 
         return Response({'url': file_url}, status=status.HTTP_201_CREATED)
 
