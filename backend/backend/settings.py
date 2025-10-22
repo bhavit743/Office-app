@@ -17,6 +17,8 @@ from google.oauth2 import service_account
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+print("DEBUG: GS_BUCKET_NAME =", os.getenv("GS_BUCKET_NAME"))
+print("DEBUG: GS_CREDENTIALS_JSON length =", len(os.getenv("GS_CREDENTIALS_JSON", "")))
 
 GS_DEFAULT_ACL = 'publicRead'
 
@@ -181,3 +183,4 @@ MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_IMAGE_BACKEND = "pillow"
 CKEDITOR_ALLOW_NONIMAGE_FILES = False
+
