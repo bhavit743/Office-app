@@ -1,9 +1,13 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
-  const router = useRouter();
-  const current = router.pathname;
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navItems = [
     { name: "Email", href: "/email" },
@@ -13,23 +17,30 @@ export default function Navbar() {
 
   return (
     <header className="w-full bg-white shadow-md sticky top-0 z-50">
-      <div className="mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         {/* Logo */}
-        <div className="text-xl font-extrabold text-indigo-600">
-          <img src="/logo.jpeg" className="h-16 w-auto mr-2"></img>
-        </div>
+        <Link href="/" className="flex items-center space-x-2">
+          <img
+            src="/logo.jpeg"
+            alt="Logo"
+            className="h-10 w-auto rounded-md object-cover"
+          />
+          <span className="hidden sm:block text-lg sm:text-xl font-extrabold text-[#253D5B]">
+            Office App
+          </span>
+        </Link>
 
-        {/* Navigation */}
-        <nav className="flex space-x-6">
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex space-x-6">
           {navItems.map((item) => {
-            const active = current === item.href;
+            const active = pathname === item.href;
             return (
               <Link key={item.name} href={item.href}>
                 <span
-                  className={`cursor-pointer font-medium transition ${
+                  className={`cursor-pointer font-medium transition duration-150 ${
                     active
-                      ? "text-indigo-600 border-b-2 border-indigo-600 pb-1"
-                      : "text-gray-700 hover:text-indigo-500"
+                      ? "text-[#306B34] border-b-2 border-[#306B34] pb-1"
+                      : "text-gray-700 hover:text-[#306B34]"
                   }`}
                 >
                   {item.name}
@@ -38,7 +49,41 @@ export default function Navbar() {
             );
           })}
         </nav>
+
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 transition"
+          aria-label="Toggle Menu"
+        >
+          {menuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
+
+      {/* Mobile Dropdown Menu */}
+      {menuOpen && (
+        <div className="md:hidden border-t border-gray-200 bg-white shadow-sm">
+          <nav className="flex flex-col px-6 py-3 space-y-3">
+            {navItems.map((item) => {
+              const active = pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={`font-medium transition ${
+                    active
+                      ? "text-[#306B34] font-semibold"
+                      : "text-gray-700 hover:text-[#306B34]"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

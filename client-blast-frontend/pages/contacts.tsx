@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { Client, Group } from "@/types";
@@ -8,14 +10,12 @@ import Popup from "@/components/Popup";
 export default function ContactsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
-
   const [groups, setGroups] = useState<Group[]>([]);
   const [groupForm, setGroupForm] = useState({ name: "", description: "" });
   const [selectedClients, setSelectedClients] = useState<number[]>([]);
   const [search, setSearch] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-
   const [popupOpen, setPopupOpen] = useState(false);
   const [popupData, setPopupData] = useState({
     title: "",
@@ -76,7 +76,8 @@ export default function ContactsPage() {
 
   const uploadFile = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return showPopup("Error", "Please select a CSV file", "error");
+    if (!file)
+      return showPopup("Error", "Please select a CSV file", "error");
 
     try {
       setUploading(true);
@@ -84,10 +85,15 @@ export default function ContactsPage() {
       formData.append("file", file);
       const res = await api.post("upload_csv/", formData);
       await refresh();
-      showPopup("Success", res.data.message || "Contacts uploaded successfully!", "success");
+      showPopup(
+        "Success",
+        res.data.message || "Contacts uploaded successfully!",
+        "success"
+      );
       setFile(null);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || "Failed to upload contacts";
+      const errorMessage =
+        err.response?.data?.error || "Failed to upload contacts";
       showPopup("Error", errorMessage, "error");
     } finally {
       setUploading(false);
@@ -99,14 +105,18 @@ export default function ContactsPage() {
   );
 
   return (
-    <div className="min-h-screen p-8 font-sans">
-      <div className="max-w-6xl mx-auto space-y-12">
-        {/* Contacts Section */}
-        <section className="bg-white rounded-2xl shadow-lg border border-[#ECE4B7] p-8 space-y-6">
-          <h1 className="text-3xl font-extrabold text-[#253D5B]">Contacts</h1>
+    <div className="min-h-screen w-full bg-gray-50 px-4 sm:px-6 lg:px-8 py-8 font-sans">
+      <div className="mx-auto w-full max-w-6xl space-y-10">
+        {/* CONTACTS SECTION */}
+        <section className="bg-white rounded-2xl shadow-md border border-[#ECE4B7] p-6 sm:p-8 space-y-6">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#253D5B]">
+            Contacts
+          </h1>
+
+          {/* Add Contact Form */}
           <form
             onSubmit={addClient}
-            className="grid grid-cols-1 md:grid-cols-3 gap-4"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             <input
               className="p-3 rounded-xl border border-[#ECE4B7] focus:ring-2 focus:ring-[#306B34]/60 focus:border-[#306B34]"
@@ -126,13 +136,16 @@ export default function ContactsPage() {
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
-            <button className="col-span-1 md:col-span-3 py-3 bg-gradient-to-r from-[#306B34] to-[#254C27] text-white font-medium rounded-xl shadow hover:shadow-lg hover:scale-105 transition-all duration-200">
+            <button
+              type="submit"
+              className="col-span-1 sm:col-span-2 lg:col-span-3 py-3 bg-gradient-to-r from-[#306B34] to-[#254C27] text-white font-medium rounded-xl shadow hover:shadow-lg hover:scale-105 transition-all duration-200"
+            >
               Add Contact
             </button>
           </form>
 
           {/* Search + List */}
-          <div className="space-y-3 max-h-96 overflow-y-auto border border-[#ECE4B7] rounded-xl p-3 bg-[#ECE4B7]/20">
+          <div className="space-y-3 max-h-[24rem] overflow-y-auto border border-[#ECE4B7] rounded-xl p-3 bg-[#ECE4B7]/20">
             <input
               type="text"
               placeholder="Search contacts..."
@@ -140,15 +153,23 @@ export default function ContactsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            {filteredClients.map((c) => (
-              <ContactCard key={c.id} client={c} refresh={refresh} />
-            ))}
+            {filteredClients.length ? (
+              filteredClients.map((c) => (
+                <ContactCard key={c.id} client={c} refresh={refresh} />
+              ))
+            ) : (
+              <p className="text-gray-500 text-sm italic">No contacts found</p>
+            )}
           </div>
         </section>
 
-        {/* Groups Section */}
-        <section className="bg-white rounded-2xl shadow-lg border border-[#ECE4B7] p-8 space-y-6">
-          <h1 className="text-3xl font-extrabold text-[#253D5B]">Groups</h1>
+        {/* GROUPS SECTION */}
+        <section className="bg-white rounded-2xl shadow-md border border-[#ECE4B7] p-6 sm:p-8 space-y-6">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#253D5B]">
+            Groups
+          </h1>
+
+          {/* Add Group Form */}
           <form onSubmit={addGroup} className="space-y-4">
             <input
               className="w-full p-3 rounded-xl border border-[#ECE4B7] focus:ring-2 focus:ring-[#306B34]/60 focus:border-[#306B34]"
@@ -174,55 +195,71 @@ export default function ContactsPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
             <div className="border border-[#ECE4B7] rounded-xl p-3 max-h-40 overflow-y-auto bg-[#ECE4B7]/20">
-              {filteredClients.map((c) => (
-                <label key={c.id} className="flex items-center space-x-2 py-1">
-                  <input
-                    type="checkbox"
-                    className="accent-[#306B34]"
-                    checked={selectedClients.includes(c.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedClients([...selectedClients, c.id]);
-                      } else {
-                        setSelectedClients(
-                          selectedClients.filter((id) => id !== c.id)
-                        );
-                      }
-                    }}
-                  />
-                  <span className="text-[#253D5B]">
-                    {c.name} ({c.email})
-                  </span>
-                </label>
-              ))}
+              {filteredClients.length ? (
+                filteredClients.map((c) => (
+                  <label key={c.id} className="flex items-center space-x-2 py-1">
+                    <input
+                      type="checkbox"
+                      className="accent-[#306B34]"
+                      checked={selectedClients.includes(c.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedClients([...selectedClients, c.id]);
+                        } else {
+                          setSelectedClients(
+                            selectedClients.filter((id) => id !== c.id)
+                          );
+                        }
+                      }}
+                    />
+                    <span className="text-[#253D5B] text-sm sm:text-base">
+                      {c.name} ({c.email})
+                    </span>
+                  </label>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm italic">No clients found</p>
+              )}
             </div>
             <button
               type="submit"
-              className="px-5 py-2 bg-gradient-to-r from-[#306B34] to-[#254C27] text-white font-medium rounded-xl shadow hover:shadow-lg hover:scale-105 transition-all duration-200"
+              className="w-full sm:w-auto px-5 py-2 bg-gradient-to-r from-[#306B34] to-[#254C27] text-white font-medium rounded-xl shadow hover:shadow-lg hover:scale-105 transition-all duration-200"
             >
               Create Group
             </button>
           </form>
 
           {/* Group List */}
-          <div className="space-y-3 max-h-96 overflow-y-auto border border-[#ECE4B7] rounded-xl p-3 bg-[#ECE4B7]/20">
-            {groups.map((g) => (
-              <GroupCard key={g.id} group={g} clients={clients} refresh={refresh} />
-            ))}
+          <div className="space-y-3 max-h-[24rem] overflow-y-auto border border-[#ECE4B7] rounded-xl p-3 bg-[#ECE4B7]/20">
+            {groups.length ? (
+              groups.map((g) => (
+                <GroupCard
+                  key={g.id}
+                  group={g}
+                  clients={clients}
+                  refresh={refresh}
+                />
+              ))
+            ) : (
+              <p className="text-gray-500 text-sm italic">No groups created</p>
+            )}
           </div>
         </section>
 
-        {/* Upload Section */}
-        <section className="bg-white rounded-2xl shadow-lg border border-[#ECE4B7] p-8 space-y-6">
-          <h1 className="text-3xl font-extrabold text-[#253D5B]">
+        {/* UPLOAD SECTION */}
+        <section className="bg-white rounded-2xl shadow-md border border-[#ECE4B7] p-6 sm:p-8 space-y-6">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#253D5B]">
             Upload Contacts (CSV)
           </h1>
-          <form onSubmit={uploadFile} className="space-y-3">
+          <form
+            onSubmit={uploadFile}
+            className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-3 sm:space-y-0"
+          >
             <input
               type="file"
               accept=".csv"
               onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="block"
+              className="block w-full sm:w-auto text-sm"
             />
             <button
               disabled={uploading}
@@ -232,15 +269,16 @@ export default function ContactsPage() {
             </button>
             <a
               href="https://office-app-wu8a.onrender.com/download-template/"
-              className="px-4 py-2 bg-gradient-to-r from-[#ECE4B7] to-[#E6AA68] text-[#020122] rounded-xl shadow hover:shadow-md hover:scale-105 transition-all duration-200 inline-block"
+              className="px-4 py-2 bg-gradient-to-r from-[#ECE4B7] to-[#E6AA68] text-[#020122] rounded-xl shadow hover:shadow-md hover:scale-105 transition-all duration-200 text-center sm:text-left"
               download
             >
-              📥 Download CSV Template
+              📥 Download Template
             </a>
           </form>
         </section>
       </div>
 
+      {/* Popup */}
       <Popup
         open={popupOpen}
         setOpen={setPopupOpen}
