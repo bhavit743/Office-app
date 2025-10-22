@@ -182,4 +182,8 @@ GS_BUCKET_NAME = os.environ.get('GS_BUCKET_NAME')
 # 5. Set the media URL
 #    This tells Django what the base URL for your files is.
 MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
-MEDIA_ROOT = '' # Django-storages handles this, so we clear the local path.
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+CKEDITOR_ALLOW_NONIMAGE_FILES = False
+CKEDITOR_BROWSE_SHOW_DIRS = True

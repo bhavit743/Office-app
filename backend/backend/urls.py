@@ -22,7 +22,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("blast.api_urls")),
-    path("download-template/", views.download_template, name="download_template")
+    path("download-template/", views.download_template, name="download_template"),
+    path("ckeditor/", include("ckeditor_uploader.urls")),
 ]
 
 if settings.DEBUG:
