@@ -57,7 +57,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'blast'
+    'blast',
+    'ckeditor', 
+    'ckeditor_uploader'
 ]
 
 MIDDLEWARE = [
@@ -186,4 +188,3 @@ MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_IMAGE_BACKEND = "pillow"
 CKEDITOR_ALLOW_NONIMAGE_FILES = False
-CKEDITOR_BROWSE_SHOW_DIRS = True

@@ -210,39 +210,43 @@ def download_template(request):
 
 
 @api_view(['POST'])
-@parser_classes([MultiPartParser, FormParser]) # Handle file uploads
+@parser_classes([MultiPartParser, FormParser])
 def upload_image(request):
     """
-    Handles image uploads from the CKEditor with detailed logging.
+    Handles image uploads from CKEditor, saves to GCS, 
+    and returns CKEditor-compatible JSON response.
     """
-    logger.info("upload_image view started.") # Log start
+    logger.info("upload_image view started.")
 
     file_obj = request.FILES.get('upload')
     if not file_obj:
-        logger.error("No file found in request.FILES['upload']") # Log error
-        return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
-
-    print(f"Received file: {file_obj.name}, Size: {file_obj.size}")
+        logger.error("No file found in request.FILES['upload']")
+        return Response(
+            {"uploaded": 0, "error": {"message": "No file uploaded"}},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     try:
-        print("Attempting to save file to default storage (Google Cloud Storage)...")
-        
-        # This is the line that is likely failing
-        file_name = default_storage.save(file_obj.name, file_obj)
-        
-        print(f"File successfully saved to GCS as: {file_name}")
+        logger.info(f"Received file: {file_obj.name}, Size: {file_obj.size}")
 
-        # Construct the absolute URL
-        # Note: GCS storage doesn't use build_absolute_uri, it uses the MEDIA_URL
-        file_url = f'{settings.MEDIA_URL}{file_name}'
-        
-        print(f"Generated file URL: {file_url}")
+        # ✅ Save file to the default storage backend (GCS in production)
+        file_name = default_storage.save(f"uploads/{file_obj.name}", file_obj)
+        logger.info(f"File successfully saved to GCS as: {file_name}")
 
-        return Response({'url': file_url}, status=status.HTTP_201_CREATED)
+        # ✅ Get the full public URL (GCS uses MEDIA_URL prefix)
+        file_url = f"{settings.MEDIA_URL}{file_name}"
+
+        logger.info(f"Generated file URL: {file_url}")
+
+        # ✅ CKEditor requires this exact structure
+        return Response(
+            {"uploaded": 1, "url": file_url},
+            status=status.HTTP_201_CREATED,
+        )
 
     except Exception as e:
-        # --- THIS IS THE MOST IMPORTANT PART ---
-        # This will print the full Python traceback to your Render logs
-        logger.error(f"CRITICAL ERROR saving file to GCS: {e}", exc_info=True) 
-        # -------------------------------------
-        return Response({'error': 'Failed to save image. Check server logs.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error(f"CRITICAL ERROR saving file to GCS: {e}", exc_info=True)
+        return Response(
+            {"uploaded": 0, "error": {"message": "Failed to save image. Check server logs."}},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
