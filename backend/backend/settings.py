@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 import json
-import google.oauth2.service_account
+from google.oauth2 import service_account
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -161,25 +161,18 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
 # --- GOOGLE CLOUD STORAGE CONFIGURATION ---
 
-# 1. Load the GCS credentials from an environment variable
-#    We'll paste the *entire content* of the JSON file into an env var.
-gcs_credentials_json = os.environ.get('GCS_CREDENTIALS')
-
-if gcs_credentials_json:
-    # 2. Parse the JSON string into credentials
-    gcs_credentials_info = json.loads(gcs_credentials_json)
-    GS_CREDENTIALS = google.oauth2.service_account.Credentials.from_service_account_info(gcs_credentials_info)
-else:
-    # This is a fallback for local testing if you want to use a file
-    # GS_CREDENTIALS = "path/to/your-gcs-key.json"
-    print("WARNING: GCS_CREDENTIALS environment variable not set.")
-    GS_CREDENTIALS = None
-
 # 3. Set the storage backend
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 
-# 4. Set your bucket name
-GS_BUCKET_NAME = os.environ.get('GS_BUCKET_NAME')
+GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME")
+
+GS_CREDENTIALS_JSON = os.getenv("GS_CREDENTIALS_JSON")
+if GS_CREDENTIALS_JSON:
+    GS_CREDENTIALS = service_account.Credentials.from_service_account_info(
+        json.loads(GS_CREDENTIALS_JSON)
+    )
+else:
+    GS_CREDENTIALS = None
 
 # 5. Set the media URL
 #    This tells Django what the base URL for your files is.
