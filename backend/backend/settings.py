@@ -167,18 +167,23 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 
 GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME")
-
 GS_CREDENTIALS_JSON = os.getenv("GS_CREDENTIALS_JSON")
-if GS_CREDENTIALS_JSON:
-    GS_CREDENTIALS = service_account.Credentials.from_service_account_info(
-        json.loads(GS_CREDENTIALS_JSON)
-    )
-else:
-    GS_CREDENTIALS = None
 
-# 5. Set the media URL
-#    This tells Django what the base URL for your files is.
-MEDIA_URL = f'https://storage.googleapis.com/{GS_BUCKET_NAME}/'
+if GS_BUCKET_NAME and GS_CREDENTIALS_JSON:
+    try:
+        GS_CREDENTIALS = service_account.Credentials.from_service_account_info(
+            json.loads(GS_CREDENTIALS_JSON)
+        )
+        DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+        MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/"
+        MEDIA_ROOT = ""
+        print("✅ Using Google Cloud Storage")
+    except Exception as e:
+        print(f"⚠️ Failed to load GS credentials: {e}")
+else:
+    print("⚠️ Falling back to FileSystemStorage (local dev)")
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_IMAGE_BACKEND = "pillow"
