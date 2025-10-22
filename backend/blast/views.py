@@ -237,7 +237,7 @@ def upload_image(request):
         file_url = f"{settings.MEDIA_URL}{file_name}"
 
         logger.info(f"Generated file URL: {file_url}")
-
+        print(f"Using storage backend: {default_storage.__class__}")
         # ✅ CKEditor requires this exact structure
         return Response(
             {"uploaded": 1, "url": file_url},
