@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Contacts</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="p-6 max-w-6xl mx-auto">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-semibold">Clients</h1>
+    <a href="{% url 'blast:upload_contacts' %}" class="px-3 py-2 bg-slate-800 text-white rounded">Upload Excel/CSV</a>
+  </div>
+
+  <table class="w-full text-left border">
+    <thead>
+      <tr class="bg-slate-100">
+        <th class="p-2">Name</th>
+        <th class="p-2">Email</th>
+        <th class="p-2">Phone</th>
+        <th class="p-2">Company</th>
+        <th class="p-2">City</th>
+        <th class="p-2">Tags</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in clients %}
+      <tr class="border-t">
+        <td class="p-2">{{ c.name }}</td>
+        <td class="p-2">{{ c.email }}</td>
+        <td class="p-2">{{ c.phone }}</td>
+        <td class="p-2">{{ c.company }}</td>
+        <td class="p-2">{{ c.city }}</td>
+        <td class="p-2">{{ c.tags|join:", " }}</td>
+      </tr>
+      {% empty %}
+      <tr><td class="p-3" colspan="6">No clients yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

@@ -25,9 +25,6 @@ export default function Navbar() {
             alt="Logo"
             className="h-10 w-auto rounded-md object-cover"
           />
-          <span className="hidden sm:block text-lg sm:text-xl font-extrabold text-[#253D5B]">
-            Office App
-          </span>
         </Link>
 
         {/* Desktop Navigation */}

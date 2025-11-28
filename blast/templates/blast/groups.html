@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Groups</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="p-6 max-w-4xl mx-auto">
+  <h1 class="text-2xl font-semibold mb-4">Groups</h1>
+  <ul class="space-y-3">
+    {% for g in groups %}
+    <li class="border rounded p-3">
+      <div class="font-medium">{{ g.name }}</div>
+      <div class="text-sm text-slate-600">{{ g.description }}</div>
+      <div class="mt-2 text-sm">{{ g.members.count }} members</div>
+    </li>
+    {% empty %}
+    <li>No groups yet.</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Create Email Campaign</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
+  {{ form.media }}
+</head>
+<body class="p-6 max-w-4xl mx-auto">
+  <h1 class="text-2xl font-semibold mb-4">Email Campaign</h1>
+  <form method="post" class="space-y-4">{% csrf_token %}
+    <div class="grid grid-cols-2 gap-4">
+      <div>{{ form.name.label_tag }} {{ form.name }}</div>
+      <div>{{ form.from_email.label_tag }} {{ form.from_email }}</div>
+      <div class="col-span-2">{{ form.subject.label_tag }} {{ form.subject }}</div>
+      <div class="col-span-2">{{ form.body_html.label_tag }} {{ form.body_html }}</div>
+    </div>
+
+    <fieldset class="mt-4 border rounded p-4">
+      <legend class="font-medium">Recipients</legend>
+      <div class="mb-3">{{ form.recipient_mode }}</div>
+      <div class="mb-3">
+        <label class="block text-sm font-medium">Groups</label>
+        {{ form.groups }}
+      </div>
+      <div class="mb-3">
+        <label class="block text-sm font-medium">Selected Clients</label>
+        {{ form.selected_clients }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Schedule (optional)</label>
+        {{ form.scheduled_at }}
+      </div>
+    </fieldset>
+
+    <button class="px-4 py-2 bg-indigo-600 text-white rounded">Queue Send</button>
+  </form>
+</body>
+</html>
